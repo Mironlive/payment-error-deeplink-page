@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SunMail — add mailbox</title>
+    <title>SunMail — payment error</title>
     <style>
       :root {
         --text-primary: #181818;
@@ -68,9 +68,6 @@
         text-align: center;
         word-break: break-word;
       }
-      .subtitle.error {
-        color: #e10918;
-      }
       .actions {
         margin-top: auto;
         display: flex;
@@ -79,13 +76,21 @@
         width: 100%;
         flex-wrap: wrap;
       }
+      .success-icon {
+        font-size: 54px;
+        line-height: 1;
+        color: #e10918;
+        font-weight: 700;
+        margin-top: auto;
+      }
       .button {
         appearance: none;
         border: 0;
         outline: 0;
         border-radius: 40px;
         padding: 14px 24px;
-        width: 408px;
+        max-width: 408px;
+        width: 100%;
         height: 56px;
         font-size: 16px;
         font-weight: 500;
@@ -151,96 +156,18 @@
       }
     </style>
     <script>
-      const baseDeepLink = "sunmail://oauth/callback";
-
-      const qs = new URLSearchParams(window.location.search);
-      const code = qs.get("code") || "";
-      const state = qs.get("state") || "";
-      const providerError = qs.get("error") || "";
-      const providerErrorDescription = qs.get("error_description") || "";
-
-      function buildDeepLink(params) {
-        const q = new URLSearchParams(params);
-        return `${baseDeepLink}?${q.toString()}`;
-      }
-
-      function setSubtitle(text, isError = false) {
-        const el = document.querySelector(".subtitle");
-        if (el) {
-          el.textContent = text;
-          el.classList.toggle("error", !!isError);
-        }
-      }
-
-      function deepLinkToApp() {
-        let params;
-        if (code && state) {
-          params = { code, state };
-        } else if (providerError || providerErrorDescription) {
-          params = {
-            status: "error",
-            error: providerError || "oauth_error",
-            error_description:
-              providerErrorDescription || "OAuth provider returned an error",
-          };
-        } else {
-          params = {
-            status: "error",
-            error: "missing_params",
-            error_description: "Missing code/state from OAuth provider",
-          };
-        }
-        window.location.href = buildDeepLink(params);
-      }
-
-      function copyDetails() {
-        const details = JSON.stringify(
-          {
-            code: code || undefined,
-            state: state || undefined,
-            error: providerError || undefined,
-            error_description: providerErrorDescription || undefined,
-          },
-          null,
-          2
-        );
-        try {
-          navigator.clipboard.writeText(details);
-          setSubtitle("Details copied. Now click “Go to app”.");
-        } catch {
-          setSubtitle("Copy failed. Click “Go to app”.", true);
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        if (providerError || providerErrorDescription) {
-          setSubtitle(
-            providerErrorDescription || providerError || "OAuth error occurred",
-            true
-          );
-          return;
-        }
-        if (code && state) {
-          deepLinkToApp();
-          setTimeout(() => {
-            const el = document.querySelector(".subtitle");
-            if (el && !el.classList.contains("error")) {
-              setSubtitle("If nothing happened, click “Go to app”.");
-            }
-          }, 1200);
-        } else {
-          setSubtitle("Missing code/state from OAuth provider.", true);
-        }
-      });
+      const appDeepLink = "sunmail:/";
 
       function goToApp() {
-        deepLinkToApp();
+        window.location.href = appDeepLink;
       }
       window.goToApp = goToApp;
-      function copyInfo() {
-        copyDetails();
-      }
-      window.copyInfo = copyInfo;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+          goToApp();
+        }, 1200);
+      });
     </script>
   </head>
   <body>
@@ -249,8 +176,9 @@
         <img class="header__logo" src="Logo.png" alt="SunMail" />
       </div>
 
-      <h1 class="title">Add mailbox</h1>
-      <p class="subtitle">Redirecting to app...</p>
+      <h1 class="title">Payment error!</h1>
+      <p class="subtitle">Something went wrong. Please try again.</p>
+      <div class="success-icon" aria-hidden="true">✕</div>
 
       <div class="actions">
         <button class="button" onclick="goToApp()">Go to app</button>
