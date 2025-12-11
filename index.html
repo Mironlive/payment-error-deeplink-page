@@ -156,10 +156,17 @@
       }
     </style>
     <script>
-      const appDeepLink = "sunmail:/";
+      const baseDeepLink = "sunmail:/";
+      function buildErrorDeepLink() {
+        const params = new URLSearchParams({
+          status: "error",
+          error: "payment_error",
+        });
+        return `${baseDeepLink}?${params.toString()}`;
+      }
 
       function goToApp() {
-        window.location.href = appDeepLink;
+        window.location.href = buildErrorDeepLink();
       }
       window.goToApp = goToApp;
 
